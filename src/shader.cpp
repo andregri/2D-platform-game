@@ -1,0 +1,58 @@
+#include "include/shader.h"
+
+#include <fstream>
+#include <sstream>
+#include <iostream>
+
+#include <GL/glew.h>
+
+Shader::Shader(std::string vertexShaderPath, std::string fragmentShaderPath) {
+    mShader = glCreateProgram();
+    unsigned int vertexShader = Compile(vertexShaderPath, GL_VERTEX_SHADER);
+    unsigned int fragmentShader = Compile(fragmentShaderPath, GL_FRAGMENT_SHADER);
+    glAttachShader(mShader, vertexShader);
+    glAttachShader(mShader, fragmentShader);
+    glLinkProgram(mShader);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+Shader::~Shader() {
+    glUseProgram(0);
+    glDeleteProgram(mShader);
+}
+
+void Shader::Use() {
+    glUseProgram(mShader);
+}
+
+void Shader::SetUniform1i(std::string name, int value) {
+    int location = glGetUniformLocation(mShader, name.c_str());
+    if (location < 0) {
+        std::cout << "Uniform " << name << " not found!\n";
+        return;
+    }
+    glUniform1i(location, value);
+}
+
+unsigned int Shader::Compile(std::string sourcePath, unsigned int vertexType) {
+    std::string sourceCode;
+
+    std::ifstream file;
+    file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+    try {
+        file.open(sourcePath);
+        std::stringstream stream;
+        stream << file.rdbuf();
+        sourceCode = stream.str();
+        file.close();        
+    } catch (std::ifstream::failure e) {
+        std::cout << "ERROR::VERTEX_SHADER::FILE_NOT_SUCCESSFULLY_READ\n";
+    }
+    const char * sourceCodeCstr = sourceCode.c_str();
+    unsigned int shader = glCreateShader(vertexType);
+    glShaderSource(shader, 1, &sourceCodeCstr, NULL);
+    glCompileShader(shader);
+
+    return shader;
+}
