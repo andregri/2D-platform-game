@@ -4,9 +4,7 @@
 #include <sstream>
 #include <iostream>
 
-#include <GL/glew.h>
-
-Shader::Shader(std::string vertexShaderPath, std::string fragmentShaderPath) {
+Shader::Shader(const std::string & vertexShaderPath, const std::string & fragmentShaderPath) {
     mShader = glCreateProgram();
     unsigned int vertexShader = Compile(vertexShaderPath, GL_VERTEX_SHADER);
     unsigned int fragmentShader = Compile(fragmentShaderPath, GL_FRAGMENT_SHADER);
@@ -22,11 +20,11 @@ Shader::~Shader() {
     glDeleteProgram(mShader);
 }
 
-void Shader::Use() {
+void Shader::Use() const {
     glUseProgram(mShader);
 }
 
-void Shader::SetUniform1i(std::string name, int value) {
+void Shader::SetUniform1i(const std::string & name, int value) const {
     int location = glGetUniformLocation(mShader, name.c_str());
     if (location < 0) {
         std::cout << "Uniform " << name << " not found!\n";
@@ -35,7 +33,16 @@ void Shader::SetUniform1i(std::string name, int value) {
     glUniform1i(location, value);
 }
 
-unsigned int Shader::Compile(std::string sourcePath, unsigned int vertexType) {
+void Shader::SetUniformMatrix4f(const std::string & name, const glm::mat4 & value) const {
+    int location = glGetUniformLocation(mShader, name.c_str());
+    if (location < 0) {
+        std::cout << "Uniform " << name << " not found!\n";
+        return;
+    }
+    glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+}
+
+unsigned int Shader::Compile(const std::string & sourcePath, unsigned int vertexType) {
     std::string sourceCode;
 
     std::ifstream file;

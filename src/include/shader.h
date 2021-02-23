@@ -1,20 +1,25 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #include <string>
 
 class Shader {
     public:
-        Shader(std::string vertexShaderPath, std::string fragmentShaderPath);
+        Shader(const std::string & vertexShaderPath, const std::string & fragmentShaderPath);
         ~Shader();
-        void Use();
+        void Use() const;
 
-        void SetUniform1i(std::string name, int value);
+        void SetUniform1i(const std::string & name, int value) const;
+        void SetUniformMatrix4f(const std::string & name, const glm::mat4 & value) const;
 
     private:
         unsigned int mShader;
 
-        unsigned int Compile(std::string sourcePath, unsigned int vertexType);
+        unsigned int Compile(const std::string & sourcePath, unsigned int vertexType);
 };
 
 #endif

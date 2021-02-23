@@ -1,6 +1,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "../external/stb/stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <stdio.h>
 #include <fstream>
@@ -9,9 +12,13 @@
 #include <sstream>
 
 #include "shader.h"
+#include "rectangle.h"
 
 int main(void)
 {
+    constexpr float WINDOW_WIDTH = 800;
+    constexpr float WINDOW_HEIGHT = 600;
+
     GLFWwindow* window;
 
     /* Initialize the library */
@@ -19,7 +26,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -37,6 +44,7 @@ int main(void)
     }
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
+    glCullFace(GL_FRONT_AND_BACK);
 
     /* Create a shader */
     Shader shader = Shader("../common/vertex.shader", "../common/fragment.shader");
@@ -103,10 +111,23 @@ int main(void)
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
-    //glUseProgram(shaderProgram);
-    //glUniform1i(glGetUniformLocation(shaderProgram, "ourTexture"), 0);
+
     shader.Use();
     shader.SetUniform1i("ourTexture", 0);
+
+    glm::mat4 model         = glm::mat4(1.0f);
+    glm::mat4 view          = glm::mat4(1.0f);
+    glm::mat4 projection    = glm::mat4(1.0f);
+    //projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
+    projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
+    //projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    shader.SetUniformMatrix4f("view", view);
+    shader.SetUniformMatrix4f("model", model);
+    shader.SetUniformMatrix4f("projection", projection);
+    
+    /* Test rectangle class */
+    Rectangle r(400.0f, 300.0f, 50.0f, 50.0f);
+    r.SetTexture("../resources/bricks.jpg", shader);
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
@@ -115,13 +136,14 @@ int main(void)
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glActiveTexture(GL_TEXTURE0);
+        /*glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        //glUseProgram(shaderProgram);
         shader.Use();
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
+
+        r.Draw(shader);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -133,7 +155,6 @@ int main(void)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    //glDeleteProgram(shaderProgram);
 
     glfwTerminate();
     return 0;

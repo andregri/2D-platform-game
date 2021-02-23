@@ -20,6 +20,7 @@ add_library(STB_IMAGE "external/stb/stb_image.cpp")
 add_executable(Tutorial
     src/main.cpp
     src/shader.cpp
+    src/rectangle.cpp
 )
 
 target_include_directories(Tutorial
