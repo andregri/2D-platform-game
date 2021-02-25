@@ -8,13 +8,15 @@
 #include <iostream>
 
 
-Rectangle::Rectangle(int centerX, int centerY, int width, int height) :
+Rectangle::Rectangle(float centerX, float centerY, int width, int height) :
     mCenterX(centerX), mCenterY(centerY), mWidth(width), mHeight(height) {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    vertices[0] *= width / 2; vertices[8] *= width / 2; vertices[16] *= width / 2; vertices[24] *= width / 2;
+    vertices[1] *= height / 2; vertices[9] *= height / 2; vertices[17] *= height / 2; vertices[25] *= height / 2;
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -44,10 +46,11 @@ void Rectangle::SetTexture(const std::string & path, const Shader & shader) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
@@ -68,7 +71,7 @@ void Rectangle::Draw(const Shader & shader) {
     // set the model matrix uniform
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(mCenterX, mCenterY, 0));
-    model = glm::scale(model, glm::vec3(mWidth, mHeight, 1));
+    //model = glm::scale(model, glm::vec3(mWidth, mHeight, 0));
 
     shader.Use();
     shader.SetUniformMatrix4f("model", model);

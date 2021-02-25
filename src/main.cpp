@@ -17,7 +17,7 @@
 int main(void)
 {
     constexpr float WINDOW_WIDTH = 800;
-    constexpr float WINDOW_HEIGHT = 600;
+    constexpr float WINDOW_HEIGHT = 450;
 
     GLFWwindow* window;
 
@@ -118,38 +118,72 @@ int main(void)
     glm::mat4 model         = glm::mat4(1.0f);
     glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
-    //projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-    projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
-    //projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    projection = glm::ortho(0.0f, WINDOW_WIDTH, 0.0f, WINDOW_HEIGHT, -1.0f, 1.0f);
     shader.SetUniformMatrix4f("view", view);
     shader.SetUniformMatrix4f("model", model);
     shader.SetUniformMatrix4f("projection", projection);
     
     /* Test rectangle class */
-    Rectangle r(400.0f, 300.0f, 50.0f, 50.0f);
-    r.SetTexture("../resources/bricks.jpg", shader);
+    Rectangle background1(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
+    Rectangle background2(WINDOW_WIDTH + WINDOW_WIDTH / 2 - 1, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT);
+    background1.SetTexture("../resources/background.png", shader);
+    background2.SetTexture("../resources/background.png", shader);
+
+    // deltaTime variables
+    // -------------------
+    float deltaTime = 0.0f;
+    float lastFrame = 0.0f;
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
-        /* Render here */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        /*glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        shader.Use();
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
-
-        r.Draw(shader);
-
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        // calculate delta time
+        // --------------------
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        /* Process input */
+        float velocity = 300 * deltaTime;
+        // Scroll infinite background
+        int state_a = glfwGetKey(window, GLFW_KEY_A);
+        if (state_a == GLFW_PRESS)
+        {
+            background1.mCenterX += velocity;
+            background2.mCenterX += velocity;
+        }
+        int state_d = glfwGetKey(window, GLFW_KEY_D);
+        if (state_d == GLFW_PRESS)
+        {
+            background1.mCenterX -= velocity;
+            background2.mCenterX -= velocity;
+        }
+
+        if (background1.mCenterX < -WINDOW_WIDTH / 2) {
+            background1.mCenterX = WINDOW_WIDTH + WINDOW_WIDTH / 2 - 5;
+        }
+        if (background2.mCenterX < -WINDOW_WIDTH / 2) {
+            background2.mCenterX = WINDOW_WIDTH + WINDOW_WIDTH / 2 - 5;
+        }
+        if (background1.mCenterX > WINDOW_WIDTH + WINDOW_WIDTH / 2) {
+            background1.mCenterX = -WINDOW_WIDTH / 2 + 5;
+        }
+        if (background2.mCenterX > WINDOW_WIDTH + WINDOW_WIDTH / 2) {
+            background2.mCenterX = -WINDOW_WIDTH / 2 + 5;
+        }
+
+        /* Render here */
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);        
+
+        background1.Draw(shader);
+        background2.Draw(shader);
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
     }
 
     glDeleteVertexArrays(1, &VAO);
