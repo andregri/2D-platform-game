@@ -8,8 +8,8 @@
 #include <iostream>
 
 
-Rectangle::Rectangle(float centerX, float centerY, int width, int height) :
-    mCenterX(centerX), mCenterY(centerY), mWidth(width), mHeight(height) {
+Rectangle::Rectangle(float centerX, float centerY, int width, int height, const Shader & shader) :
+    mCenterX(centerX), mCenterY(centerY), mWidth(width), mHeight(height), mShader(shader) {
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -36,7 +36,7 @@ Rectangle::Rectangle(float centerX, float centerY, int width, int height) :
     glBindVertexArray(0);
 }
 
-void Rectangle::SetTexture(const std::string & path, const Shader & shader) {
+void Rectangle::SetTexture(const std::string & path) {
     glGenTextures(1, &mTexture);
     glBindTexture(GL_TEXTURE_2D, mTexture);
     // set the texture wrapping/filtering options (on the currently bound texture object)
@@ -59,11 +59,11 @@ void Rectangle::SetTexture(const std::string & path, const Shader & shader) {
     }
     stbi_image_free(data);
 
-    shader.Use();
-    shader.SetUniform1i("ourTexture", 0);
+    mShader.Use();
+    mShader.SetUniform1i("ourTexture", 0);
 }
 
-void Rectangle::Draw(const Shader & shader) {
+void Rectangle::Draw() {
     // active the texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mTexture);
@@ -73,8 +73,8 @@ void Rectangle::Draw(const Shader & shader) {
     model = glm::translate(model, glm::vec3(mCenterX, mCenterY, 0));
     //model = glm::scale(model, glm::vec3(mWidth, mHeight, 0));
 
-    shader.Use();
-    shader.SetUniformMatrix4f("model", model);
+    mShader.Use();
+    mShader.SetUniformMatrix4f("model", model);
     
     // draw the rectangle
     glBindVertexArray(VAO);

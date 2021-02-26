@@ -5,11 +5,11 @@
 ScrollingBackground::ScrollingBackground(int winWidth, int winHeight, const std::string & texPath, const Shader & shader)
     :   mShader(shader),
         mWinWidth(winWidth), mWinHeight(winHeight),
-        mRect1(winWidth / 2, winHeight / 2, winWidth, winHeight),
-        mRect2(winWidth + winWidth / 2 - 1, winHeight / 2, winWidth, winHeight)
+        mRect1(winWidth / 2, winHeight / 2, winWidth, winHeight, mShader),
+        mRect2(winWidth + winWidth / 2 - 1, winHeight / 2, winWidth, winHeight, mShader)
 {
-    mRect1.SetTexture(texPath, mShader);
-    mRect2.SetTexture(texPath, mShader);
+    mRect1.SetTexture(texPath);
+    mRect2.SetTexture(texPath);
 }
 
 void ScrollingBackground::Update(float deltaTime, const bool keys[]) {
@@ -41,6 +41,6 @@ void ScrollingBackground::Update(float deltaTime, const bool keys[]) {
 }
 
 void ScrollingBackground::Draw() {
-    mRect1.Draw(mShader);
-    mRect2.Draw(mShader);
+    mRect1.Draw();
+    mRect2.Draw();
 }

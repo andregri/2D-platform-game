@@ -7,9 +7,9 @@
 class Rectangle {
     public:
         float mCenterX, mCenterY;
-        Rectangle(float centerX, float centerY, int width, int height);
-        void SetTexture(const std::string & path, const Shader & shader);
-        void Draw(const Shader & shader);
+        Rectangle(float centerX, float centerY, int width, int height, const Shader & shader);
+        void SetTexture(const std::string & path);
+        void Draw();
 
     private:
         unsigned int VAO, VBO, EBO;
@@ -25,6 +25,7 @@ class Rectangle {
             1, 2, 3  // second triangle
         };
 
+        Shader mShader;
         int mWidth, mHeight;
         unsigned int mTexture;
 
