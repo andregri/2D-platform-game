@@ -23,6 +23,7 @@ add_executable(Tutorial
     src/rectangle.cpp
     src/scrolling_background.cpp
     src/character.cpp
+    src/character_action.cpp
 )
 
 target_include_directories(Tutorial

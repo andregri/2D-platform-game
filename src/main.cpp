@@ -77,6 +77,7 @@ int main(void)
     // Create a character
     // -------------------
     Character character(WINDOW_WIDTH / 2, 98.0f, 680 / 4, 472 / 4, characterShader);
+
     std::string walkSpritePaths[10] = {
         "../resources/dinosprite/Walk (1).png",
         "../resources/dinosprite/Walk (2).png",
@@ -88,7 +89,34 @@ int main(void)
         "../resources/dinosprite/Walk (8).png",
         "../resources/dinosprite/Walk (9).png",
         "../resources/dinosprite/Walk (10).png"};
-    character.SetSprite(10, walkSpritePaths);
+    CharacterAction walkAction(0.1f);
+    character.AddAction("walk", walkAction, 10, walkSpritePaths);
+
+    std::string runSpritePaths[8] = {
+        "../resources/dinosprite/Run (1).png",
+        "../resources/dinosprite/Run (2).png",
+        "../resources/dinosprite/Run (3).png",
+        "../resources/dinosprite/Run (4).png",
+        "../resources/dinosprite/Run (5).png",
+        "../resources/dinosprite/Run (6).png",
+        "../resources/dinosprite/Run (7).png",
+        "../resources/dinosprite/Run (8).png"};
+    CharacterAction runAction(0.05f);
+    character.AddAction("run", runAction, 8, runSpritePaths);
+
+    std::string idleSpritePaths[10] = {
+        "../resources/dinosprite/Idle (1).png",
+        "../resources/dinosprite/Idle (2).png",
+        "../resources/dinosprite/Idle (3).png",
+        "../resources/dinosprite/Idle (4).png",
+        "../resources/dinosprite/Idle (5).png",
+        "../resources/dinosprite/Idle (6).png",
+        "../resources/dinosprite/Idle (7).png",
+        "../resources/dinosprite/Idle (8).png",
+        "../resources/dinosprite/Idle (9).png",
+        "../resources/dinosprite/Idle (10).png"};
+    CharacterAction idleAction(0.1f);
+    character.AddAction("idle", idleAction, 10, idleSpritePaths);
 
     // deltaTime variables
     // -------------------

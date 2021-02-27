@@ -10,48 +10,52 @@ Character::Character(float centerX, float centerY, int width, int height, const 
     :   mShader(shader),
         mCenterX(centerX), mCenterY(centerY),
         mWidth(width), mHeight(height),
-        mWalkState(0),
-        mTimePerWalkSprite(0.1f), mDeltaTimeWalkSprite(0.0f),
-        mGoRight(true)
+        mGoRight(true), mAction("idle")
 {
 }
 
-void Character::SetSprite(int layers, const std::string texPaths[]) {
-    mMaxWalkState = layers;
-    for (int i = 0; i < layers; ++i) {
-        Rectangle rect(mCenterX, mCenterY, mWidth, mHeight, mShader);
-        rect.SetTexture(texPaths[i]);
-        mWalkRects.push_back(rect);
+void Character::AddAction(const std::string & name, CharacterAction & action, int numSprites, const std::string * spritePaths)
+{
+    std::cout << "void Character::AddAction\n";
+
+    action.SetSprites(numSprites, spritePaths, mCenterX, mCenterY, mWidth, mHeight, mShader);
+    mActions[name] = action;
+}
+
+
+void Character::Update(float deltaTime, const bool keys[])
+{
+    if (keys[GLFW_KEY_A]) {
+        if (keys[GLFW_KEY_LEFT_SHIFT]) {
+            mAction = "run";
+            mActions["run"].Update(deltaTime);
+        }
+        else {
+            mAction = "walk";
+            mActions["walk"].Update(deltaTime);
+        }
+        mGoRight = false;
+    }
+    else if (keys[GLFW_KEY_D]) {
+        if (keys[GLFW_KEY_LEFT_SHIFT]) {
+            mAction = "run";
+            mActions["run"].Update(deltaTime);
+        }
+        else {
+            mAction = "walk";
+            mActions["walk"].Update(deltaTime);
+        }
+        mGoRight = true;
+    }
+    else {
+        mAction = "idle";
+        mActions["idle"].Update(deltaTime);
     }
 }
 
 
-void Character::Update(float deltaTime, const bool keys[]) {
-    mDeltaTimeWalkSprite += deltaTime;
-
-    if (mDeltaTimeWalkSprite > mTimePerWalkSprite) {
-        mDeltaTimeWalkSprite = 0.0f;
-        if (keys[GLFW_KEY_A])
-        {
-            mGoRight = false;
-            --mWalkState;
-            if (mWalkState < 0) {
-                mWalkState = mMaxWalkState -1;
-            }
-            mWalkState %= mMaxWalkState;
-
-        }
-        if (keys[GLFW_KEY_D])
-        {
-            mGoRight = true;
-            ++mWalkState;
-            mWalkState %= mMaxWalkState;
-        }
-    }
-}
-
-
-void Character::Draw() {
+void Character::Draw()
+{
     mShader.SetUniform1i("goRight", mGoRight);
-    mWalkRects.at(mWalkState).Draw();
+    mActions[mAction].Draw();
 }
