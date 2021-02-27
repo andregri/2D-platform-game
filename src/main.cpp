@@ -14,6 +14,7 @@
 #include "shader.h"
 #include "rectangle.h"
 #include "scrolling_background.h"
+#include "character.h"
 
 bool Keys[1024] = {false};
 
@@ -50,12 +51,15 @@ int main(void)
     }
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
-    glCullFace(GL_FRONT_AND_BACK);
+    glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     glfwSetKeyCallback(window, key_callback);
 
 
     /* Create a shader */
-    Shader shader = Shader("../common/vertex.shader", "../common/fragment.shader");
+    Shader shader           = Shader("../common/vertex.shader", "../common/fragment.shader");
+    Shader characterShader  = Shader("../common/vertex.shader", "../common/character_fragment.shader");
 
     glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
@@ -63,9 +67,28 @@ int main(void)
     shader.Use();
     shader.SetUniformMatrix4f("view", view);
     shader.SetUniformMatrix4f("projection", projection);
+    characterShader.Use();
+    characterShader.SetUniformMatrix4f("view", view);
+    characterShader.SetUniformMatrix4f("projection", projection);
 
     // Create a scrolling background
     ScrollingBackground scrollingBackground(WINDOW_WIDTH, WINDOW_HEIGHT, "../resources/background.png", shader);
+
+    // Create a character
+    // -------------------
+    Character character(WINDOW_WIDTH / 2, 98.0f, 680 / 4, 472 / 4, characterShader);
+    std::string walkSpritePaths[10] = {
+        "../resources/dinosprite/Walk (1).png",
+        "../resources/dinosprite/Walk (2).png",
+        "../resources/dinosprite/Walk (3).png",
+        "../resources/dinosprite/Walk (4).png",
+        "../resources/dinosprite/Walk (5).png",
+        "../resources/dinosprite/Walk (6).png",
+        "../resources/dinosprite/Walk (7).png",
+        "../resources/dinosprite/Walk (8).png",
+        "../resources/dinosprite/Walk (9).png",
+        "../resources/dinosprite/Walk (10).png"};
+    character.SetSprite(10, walkSpritePaths);
 
     // deltaTime variables
     // -------------------
@@ -87,12 +110,14 @@ int main(void)
         // UPDATE
         // -----------------
         scrollingBackground.Update(deltaTime, Keys);
+        character.Update(deltaTime, Keys);
 
         /* Render here */
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);        
 
         scrollingBackground.Draw();
+        character.Draw();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

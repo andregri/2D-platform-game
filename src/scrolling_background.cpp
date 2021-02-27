@@ -13,7 +13,7 @@ ScrollingBackground::ScrollingBackground(int winWidth, int winHeight, const std:
 }
 
 void ScrollingBackground::Update(float deltaTime, const bool keys[]) {
-    float velocity = 300 * deltaTime;
+    float velocity = 150 * deltaTime;
     // Scroll infinite background
     if (keys[GLFW_KEY_A])
     {

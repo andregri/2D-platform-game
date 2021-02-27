@@ -15,16 +15,17 @@ Shader::Shader(const std::string & vertexShaderPath, const std::string & fragmen
     glDeleteShader(fragmentShader);
 }
 
-Shader::~Shader() {
-    glUseProgram(0);
-    glDeleteProgram(mShader);
-}
+//Shader::~Shader() {
+//    glUseProgram(0);
+//    glDeleteProgram(mShader);
+//}
 
 void Shader::Use() const {
     glUseProgram(mShader);
 }
 
 void Shader::SetUniform1i(const std::string & name, int value) const {
+    Use();
     int location = glGetUniformLocation(mShader, name.c_str());
     if (location < 0) {
         std::cout << "Uniform " << name << " not found!\n";
@@ -34,12 +35,14 @@ void Shader::SetUniform1i(const std::string & name, int value) const {
 }
 
 void Shader::SetUniformMatrix4f(const std::string & name, const glm::mat4 & value) const {
+    Use();
     int location = glGetUniformLocation(mShader, name.c_str());
     if (location < 0) {
         std::cout << "Uniform " << name << " not found!\n";
         return;
     }
     glUniformMatrix4fv(location, 1, GL_FALSE, &value[0][0]);
+    glUseProgram(0);
 }
 
 unsigned int Shader::Compile(const std::string & sourcePath, unsigned int vertexType) {

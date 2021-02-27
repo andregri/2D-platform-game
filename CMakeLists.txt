@@ -22,6 +22,7 @@ add_executable(Tutorial
     src/shader.cpp
     src/rectangle.cpp
     src/scrolling_background.cpp
+    src/character.cpp
 )
 
 target_include_directories(Tutorial

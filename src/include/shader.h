@@ -10,7 +10,7 @@
 class Shader {
     public:
         Shader(const std::string & vertexShaderPath, const std::string & fragmentShaderPath);
-        ~Shader();
+        //~Shader();
         void Use() const;
 
         void SetUniform1i(const std::string & name, int value) const;
