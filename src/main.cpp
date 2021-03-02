@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <box2d/box2d.h>
 
 #include <stdio.h>
 #include <fstream>
@@ -71,12 +72,32 @@ int main(void)
     characterShader.SetUniformMatrix4f("view", view);
     characterShader.SetUniformMatrix4f("projection", projection);
 
+    
+    // Set physics with box2d
+    // -------------------
+    //const float PPM = 32.0f; // Pixel per Meter
+
+    // Define the gravity vector.
+    b2Vec2 gravity(0.0f, -10.0f);
+
+    // Construct a world object, which will hold and simulate the rigid bodies.
+    b2World world(gravity);    
+
+    // Prepare for simulation. Typically we use a time step of 1/60 of a
+	// second (60Hz) and 10 iterations. This provides a high quality simulation
+	// in most game scenarios.
+    float frameRate = 60.0f;
+	float timeStep = 1.0f / frameRate;
+	int32 velocityIterations = 6;
+	int32 positionIterations = 2;
+
+
     // Create a scrolling background
-    ScrollingBackground scrollingBackground(WINDOW_WIDTH, WINDOW_HEIGHT, "../resources/background.png", shader);
+    ScrollingBackground scrollingBackground(WINDOW_WIDTH, WINDOW_HEIGHT, 85.0f, "../resources/background.png", shader, world);
 
     // Create a character
     // -------------------
-    Character character(WINDOW_WIDTH / 2, 98.0f, 680 / 4, 472 / 4, characterShader);
+    Character character(WINDOW_WIDTH / 2, 200.0f, 680 / 4, 472 / 4, characterShader, world);
 
     std::string walkSpritePaths[10] = {
         "../resources/dinosprite/Walk (1).png",
@@ -132,26 +153,31 @@ int main(void)
         deltaTime = currentFrame - lastFrame;
 
         if (deltaTime >= timeStep) {
-        lastFrame = currentFrame;
+            lastFrame = currentFrame;
 
-        /* Poll for and process events */
-        glfwPollEvents();
+            /* Poll for and process events */
+            glfwPollEvents();
 
-        // UPDATE
-        // -----------------
-        scrollingBackground.Update(deltaTime, Keys);
-        character.Update(deltaTime, Keys);
+            // Compute World physics
+            world.Step(timeStep, velocityIterations, positionIterations);
 
-        /* Render here */
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);        
+            
 
-        scrollingBackground.Draw();
-        character.Draw();
+            // UPDATE
+            // -----------------
+            scrollingBackground.Update(deltaTime, Keys);
+            character.Update(deltaTime, Keys);
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
-    }
+            /* Render here */
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);        
+
+            scrollingBackground.Draw();
+            character.Draw();
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window);
+        }
     }
 
     glfwTerminate();

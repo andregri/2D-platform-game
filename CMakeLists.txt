@@ -15,6 +15,9 @@ include_directories(${GLEW_INCLUDE_PATH})
 # STB_IMAGE
 add_library(STB_IMAGE "external/stb/stb_image.cpp")
 
+# Box2d
+find_package(box2d REQUIRED)
+
 
 # add the executable
 add_executable(Tutorial
@@ -36,4 +39,5 @@ target_link_libraries(Tutorial PUBLIC
     glfw
     ${GLFW_LIBRARIES}
     STB_IMAGE
+    box2d
 )

@@ -6,11 +6,12 @@
 #include "character_action.h"
 #include <vector>
 #include <map>
+#include <box2d/box2d.h>
 
 class Character {
     public:
         float mCenterX, mCenterY;
-        Character(float centerX, float centerY, int width, int height, const Shader & shader);
+        Character(float centerX, float centerY, int width, int height, const Shader & shader, b2World & world);
         void AddAction(const std::string & name, CharacterAction & action, int numSprites, const std::string * spritePaths);
         void Update(float deltaTime, const bool keys[]);
         void Draw();
@@ -21,6 +22,7 @@ class Character {
         bool mGoRight;
         std::string mAction;
         std::map<std::string, CharacterAction> mActions;
+        b2Body* mBody;
 };
 
 #endif

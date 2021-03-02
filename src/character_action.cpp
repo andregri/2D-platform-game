@@ -20,6 +20,8 @@ void CharacterAction::SetSprites(int num, const std::string * paths,
     std::cout << "void CharacterAction::SetSprites(int num, const std::string * paths,"
         "float centerX, float centerY, int width, int height, const Shader & shader)\n";
     
+    mCenterX = centerX;
+    mCenterY = centerY;
     mNumStates = num;
 
     for (int i = 0; i < mNumStates; ++i) {
@@ -30,7 +32,7 @@ void CharacterAction::SetSprites(int num, const std::string * paths,
 }
 
 
-void CharacterAction::Update(float deltaTime)
+void CharacterAction::Update(float deltaTime, float centerX, float centerY)
 {
     //std::cout << "void CharacterAction::Update(float deltaTime, const bool keys[])\n";
 
@@ -41,10 +43,15 @@ void CharacterAction::Update(float deltaTime)
         ++mState;
         mState %= mNumStates;
     }
+
+    mCenterX = centerX;
+    mCenterY = centerY;
 }
 
 
 void CharacterAction::Draw()
 {
+    mRects.at(mState).mCenterX = mCenterX;
+    mRects.at(mState).mCenterY = mCenterY;
     mRects.at(mState).Draw();
 }
