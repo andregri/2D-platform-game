@@ -130,6 +130,8 @@ int main(void)
         // --------------------
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
+
+        if (deltaTime >= timeStep) {
         lastFrame = currentFrame;
 
         /* Poll for and process events */
@@ -149,6 +151,7 @@ int main(void)
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
+    }
     }
 
     glfwTerminate();
