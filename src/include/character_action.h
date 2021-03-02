@@ -12,6 +12,7 @@ class CharacterAction {
         void SetSprites(int numSprites, const std::string * spritePaths, float centerX, float centerY, int width, int height, const Shader & shader);
         void Update(float deltaTime, float centerX, float centerY);
         void Draw();
+        int GetState();
 
     private:
         float mCenterX, mCenterY;

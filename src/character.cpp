@@ -11,7 +11,7 @@ Character::Character(float centerX, float centerY, int width, int height, const 
     :   mShader(shader),
         mCenterX(centerX), mCenterY(centerY),
         mWidth(width), mHeight(height),
-        mGoRight(true), mAction("idle")
+        mGoRight(true), mAction("idle"), mIsJumping(false)
 {
     std::cout << "Character::Character(float centerX, float centerY, int width, int height, const Shader & shader, b2World & world)\n";
 
@@ -51,6 +51,24 @@ void Character::Update(float deltaTime, const bool keys[])
     mCenterX = position.x * PPM;
     mCenterY = position.y * PPM;
 
+    if(mIsJumping) {
+        mAction = "jump";
+        mActions["jump"].Update(deltaTime, mCenterX, mCenterY);
+        if(mActions["jump"].GetState() == 11) {
+            mIsJumping = false;
+        }
+        return;
+    }
+
+    if(keys[GLFW_KEY_SPACE] && !mIsJumping) {
+        b2Vec2 vel = mBody->GetLinearVelocity();
+        vel.y = 8;  //upwards - don't change x velocity
+        mBody->SetLinearVelocity(vel);
+        mIsJumping = true;
+        mAction = "jump";
+        mActions["jump"].Update(deltaTime, mCenterX, mCenterY);
+    }
+    
     if (keys[GLFW_KEY_A]) {
         if (keys[GLFW_KEY_LEFT_SHIFT]) {
             mAction = "run";

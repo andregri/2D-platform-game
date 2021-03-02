@@ -139,6 +139,22 @@ int main(void)
     CharacterAction idleAction(0.1f);
     character.AddAction("idle", idleAction, 10, idleSpritePaths);
 
+    std::string jumpSpritePaths[12] = {
+        "../resources/dinosprite/Jump (1).png",
+        "../resources/dinosprite/Jump (2).png",
+        "../resources/dinosprite/Jump (3).png",
+        "../resources/dinosprite/Jump (4).png",
+        "../resources/dinosprite/Jump (5).png",
+        "../resources/dinosprite/Jump (6).png",
+        "../resources/dinosprite/Jump (7).png",
+        "../resources/dinosprite/Jump (8).png",
+        "../resources/dinosprite/Jump (9).png",
+        "../resources/dinosprite/Jump (10).png",
+        "../resources/dinosprite/Jump (11).png",
+        "../resources/dinosprite/Jump (12).png"};
+    CharacterAction jumpAction(0.15f);
+    character.AddAction("jump", jumpAction, 12, jumpSpritePaths);
+
     // deltaTime variables
     // -------------------
     float deltaTime = 0.0f;

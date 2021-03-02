@@ -23,6 +23,7 @@ class Character {
         std::string mAction;
         std::map<std::string, CharacterAction> mActions;
         b2Body* mBody;
+        bool mIsJumping;
 };
 
 #endif

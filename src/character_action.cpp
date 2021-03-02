@@ -55,3 +55,8 @@ void CharacterAction::Draw()
     mRects.at(mState).mCenterY = mCenterY;
     mRects.at(mState).Draw();
 }
+
+int CharacterAction::GetState()
+{
+    return mState;
+}
