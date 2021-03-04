@@ -16,6 +16,7 @@
 #include "rectangle.h"
 #include "scrolling_background.h"
 #include "character.h"
+#include "configuration_manager.h"
 
 bool Keys[1024] = {false};
 
@@ -24,8 +25,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main(void)
 {
-    constexpr float WINDOW_WIDTH = 800;
-    constexpr float WINDOW_HEIGHT = 450;
+    //constexpr float WINDOW_WIDTH = 800;
+    //constexpr float WINDOW_HEIGHT = 450;
+    ConfigurationManager::instance().setWindowWidth(800.0f);
+    ConfigurationManager::instance().setWindowHeight(450.0f);
 
     GLFWwindow* window;
 
@@ -34,7 +37,10 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", NULL, NULL);
+    window = glfwCreateWindow(
+        ConfigurationManager::instance().getWindowWidth(),
+        ConfigurationManager::instance().getWindowHeight(),
+        "Hello World", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -64,7 +70,10 @@ int main(void)
 
     glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
-    projection = glm::ortho(0.0f, WINDOW_WIDTH, 0.0f, WINDOW_HEIGHT, -1.0f, 1.0f);
+    projection = glm::ortho(
+        0.0f, ConfigurationManager::instance().getWindowWidth(),
+        0.0f, ConfigurationManager::instance().getWindowHeight(),
+        -1.0f, 1.0f);
     shader.Use();
     shader.SetUniformMatrix4f("view", view);
     shader.SetUniformMatrix4f("projection", projection);
@@ -93,11 +102,20 @@ int main(void)
 
 
     // Create a scrolling background
-    ScrollingBackground scrollingBackground(WINDOW_WIDTH, WINDOW_HEIGHT, 85.0f, "../resources/background.png", shader, world);
+    ScrollingBackground scrollingBackground(
+        ConfigurationManager::instance().getWindowWidth(),
+        ConfigurationManager::instance().getWindowHeight(),
+        85.0f, "../resources/background.png", shader, world);
 
     // Create a character
     // -------------------
-    Character character(WINDOW_WIDTH / 2, 200.0f, 680 / 4, 472 / 4, characterShader, world);
+    Character character(
+        ConfigurationManager::instance().getWindowWidth() / 2, 
+        200.0f, 
+        680 / 4, 
+        472 / 4, 
+        characterShader, 
+        world);
 
     std::string walkSpritePaths[10] = {
         "../resources/dinosprite/Walk (1).png",
@@ -176,8 +194,6 @@ int main(void)
 
             // Compute World physics
             world.Step(timeStep, velocityIterations, positionIterations);
-
-            
 
             // UPDATE
             // -----------------

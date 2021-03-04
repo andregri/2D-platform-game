@@ -27,6 +27,7 @@ add_executable(Tutorial
     src/scrolling_background.cpp
     src/character.cpp
     src/character_action.cpp
+    src/configuration_manager.cpp
 )
 
 target_include_directories(Tutorial
