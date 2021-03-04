@@ -1,10 +1,13 @@
 #include "character_action.h"
 #include <iostream>
 
-CharacterAction::CharacterAction(float timePerSprite)
-    : mState(0), mTimePerState(timePerSprite)
+CharacterAction::CharacterAction(Action_t type, bool unstoppable,float timePerSprite)
+    : m_type(type),
+    m_isUnstoppable(unstoppable),
+    mTimePerState(timePerSprite),
+    mState(0)
 {
-    std::cout << "CharacterAction::CharacterAction(float timePerSprite)\n";
+    std::cout << "CharacterAction::CharacterAction(Action_t type, bool unstoppable,float timePerSprite)\n";
 }
 
 
@@ -35,13 +38,18 @@ void CharacterAction::SetSprites(int num, const std::string * paths,
 void CharacterAction::Update(float deltaTime, float centerX, float centerY)
 {
     //std::cout << "void CharacterAction::Update(float deltaTime, const bool keys[])\n";
-
-    mDeltaTimeState += deltaTime;
-
-    if (mDeltaTimeState > mTimePerState) {
-        mDeltaTimeState = 0.0f;
+    
+    if (mState == 0) {
         ++mState;
-        mState %= mNumStates;
+    }
+    else {
+        mDeltaTimeState += deltaTime;
+
+        if (mDeltaTimeState > mTimePerState) {
+            mDeltaTimeState = 0.0f;
+            ++mState;
+            mState %= mNumStates;
+        }
     }
 
     mCenterX = centerX;
@@ -59,4 +67,19 @@ void CharacterAction::Draw()
 int CharacterAction::GetState()
 {
     return mState;
+}
+
+bool CharacterAction::isActive() 
+{
+    return mState > 0;
+}
+
+Action_t CharacterAction::getType()
+{
+    return m_type;
+}
+
+bool CharacterAction::isUnstoppable()
+{
+    return m_isUnstoppable;
 }

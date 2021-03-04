@@ -110,8 +110,8 @@ int main(void)
         "../resources/dinosprite/Walk (8).png",
         "../resources/dinosprite/Walk (9).png",
         "../resources/dinosprite/Walk (10).png"};
-    CharacterAction walkAction(0.1f);
-    character.AddAction("walk", walkAction, 10, walkSpritePaths);
+    CharacterAction walkAction(Action_t::WALK, false, 0.1f);
+    character.AddAction(&walkAction, 10, walkSpritePaths);
 
     std::string runSpritePaths[8] = {
         "../resources/dinosprite/Run (1).png",
@@ -122,8 +122,8 @@ int main(void)
         "../resources/dinosprite/Run (6).png",
         "../resources/dinosprite/Run (7).png",
         "../resources/dinosprite/Run (8).png"};
-    CharacterAction runAction(0.05f);
-    character.AddAction("run", runAction, 8, runSpritePaths);
+    CharacterAction runAction(Action_t::RUN, false, 0.05f);
+    character.AddAction(&runAction, 8, runSpritePaths);
 
     std::string idleSpritePaths[10] = {
         "../resources/dinosprite/Idle (1).png",
@@ -136,8 +136,8 @@ int main(void)
         "../resources/dinosprite/Idle (8).png",
         "../resources/dinosprite/Idle (9).png",
         "../resources/dinosprite/Idle (10).png"};
-    CharacterAction idleAction(0.1f);
-    character.AddAction("idle", idleAction, 10, idleSpritePaths);
+    CharacterAction idleAction(Action_t::IDLE, false, 0.1f);
+    character.AddAction(&idleAction, 10, idleSpritePaths);
 
     std::string jumpSpritePaths[12] = {
         "../resources/dinosprite/Jump (1).png",
@@ -152,8 +152,8 @@ int main(void)
         "../resources/dinosprite/Jump (10).png",
         "../resources/dinosprite/Jump (11).png",
         "../resources/dinosprite/Jump (12).png"};
-    CharacterAction jumpAction(0.15f);
-    character.AddAction("jump", jumpAction, 12, jumpSpritePaths);
+    CharacterAction jumpAction(Action_t::JUMP, true, 0.15f);
+    character.AddAction(&jumpAction, 12, jumpSpritePaths);
 
     // deltaTime variables
     // -------------------

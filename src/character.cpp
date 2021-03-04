@@ -11,7 +11,7 @@ Character::Character(float centerX, float centerY, int width, int height, const 
     :   mShader(shader),
         mCenterX(centerX), mCenterY(centerY),
         mWidth(width), mHeight(height),
-        mGoRight(true), mAction("idle"), mIsJumping(false)
+        mGoRight(true), m_currentAction(Action_t::IDLE), mIsJumping(false)
 {
     std::cout << "Character::Character(float centerX, float centerY, int width, int height, const Shader & shader, b2World & world)\n";
 
@@ -36,12 +36,12 @@ Character::Character(float centerX, float centerY, int width, int height, const 
 	mBody->CreateFixture(&fixtureDef);
 }
 
-void Character::AddAction(const std::string & name, CharacterAction & action, int numSprites, const std::string * spritePaths)
+void Character::AddAction(CharacterAction* action, int numSprites, const std::string * spritePaths)
 {
     std::cout << "void Character::AddAction\n";
 
-    action.SetSprites(numSprites, spritePaths, mCenterX, mCenterY, mWidth, mHeight, mShader);
-    mActions[name] = action;
+    action->SetSprites(numSprites, spritePaths, mCenterX, mCenterY, mWidth, mHeight, mShader);
+    mActions[action->getType()] = action;
 }
 
 
@@ -51,55 +51,42 @@ void Character::Update(float deltaTime, const bool keys[])
     mCenterX = position.x * PPM;
     mCenterY = position.y * PPM;
 
-    if(mIsJumping) {
-        mAction = "jump";
-        mActions["jump"].Update(deltaTime, mCenterX, mCenterY);
-        if(mActions["jump"].GetState() == 11) {
-            mIsJumping = false;
+    if (!mActions[m_currentAction]->isUnstoppable() || !mActions[m_currentAction]->isActive()) {
+        if(keys[GLFW_KEY_SPACE]) {
+            m_currentAction = Action_t::JUMP;
+            b2Vec2 vel = mBody->GetLinearVelocity();
+            vel.y = 8;  //upwards - don't change x velocity
+            mBody->SetLinearVelocity(vel);
         }
-        return;
+        else if (keys[GLFW_KEY_A]) {
+            if (keys[GLFW_KEY_LEFT_SHIFT]) {
+                m_currentAction = Action_t::RUN;
+            }
+            else {
+                m_currentAction = Action_t::WALK;
+            }
+            mGoRight = false;
+        }
+        else if (keys[GLFW_KEY_D]) {
+            if (keys[GLFW_KEY_LEFT_SHIFT]) {
+                m_currentAction = Action_t::RUN;
+            }
+            else {
+                m_currentAction = Action_t::WALK;
+            }
+            mGoRight = true;
+        }
+        else {
+            m_currentAction = Action_t::IDLE;
+        }
     }
 
-    if(keys[GLFW_KEY_SPACE] && !mIsJumping) {
-        b2Vec2 vel = mBody->GetLinearVelocity();
-        vel.y = 8;  //upwards - don't change x velocity
-        mBody->SetLinearVelocity(vel);
-        mIsJumping = true;
-        mAction = "jump";
-        mActions["jump"].Update(deltaTime, mCenterX, mCenterY);
-    }
-    
-    if (keys[GLFW_KEY_A]) {
-        if (keys[GLFW_KEY_LEFT_SHIFT]) {
-            mAction = "run";
-            mActions["run"].Update(deltaTime, mCenterX, mCenterY);
-        }
-        else {
-            mAction = "walk";
-            mActions["walk"].Update(deltaTime, mCenterX, mCenterY);
-        }
-        mGoRight = false;
-    }
-    else if (keys[GLFW_KEY_D]) {
-        if (keys[GLFW_KEY_LEFT_SHIFT]) {
-            mAction = "run";
-            mActions["run"].Update(deltaTime, mCenterX, mCenterY);
-        }
-        else {
-            mAction = "walk";
-            mActions["walk"].Update(deltaTime, mCenterX, mCenterY);
-        }
-        mGoRight = true;
-    }
-    else {
-        mAction = "idle";
-        mActions["idle"].Update(deltaTime, mCenterX, mCenterY);
-    }
+    mActions[m_currentAction]->Update(deltaTime, mCenterX, mCenterY);
 }
 
 
 void Character::Draw()
 {
     mShader.SetUniform1i("goRight", mGoRight);
-    mActions[mAction].Draw();
+    mActions[m_currentAction]->Draw();
 }
