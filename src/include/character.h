@@ -12,7 +12,7 @@ class Character {
     public:
         float mCenterX, mCenterY;
         Character(float centerX, float centerY, int width, int height, const Shader & shader, b2World & world);
-        void AddAction(const std::string & name, CharacterAction & action, int numSprites, const std::string * spritePaths);
+        void AddAction(CharacterAction* action, int numSprites, const std::string * spritePaths);
         void Update(float deltaTime, const bool keys[]);
         void Draw();
 
@@ -20,9 +20,10 @@ class Character {
         int mWidth, mHeight;
         Shader mShader;
         bool mGoRight;
-        std::string mAction;
-        std::map<std::string, CharacterAction> mActions;
+        Action_t m_currentAction;
+        std::map<Action_t, CharacterAction*> mActions;
         b2Body* mBody;
+        bool mIsJumping;
 };
 
 #endif
